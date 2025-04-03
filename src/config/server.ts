@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from 'cors';
 import prisma from "./db";
 import dotenv from 'dotenv';
@@ -6,10 +6,11 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 
+
 dotenv.config()
 
 const app = express();
-const port = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 
 app.use(express.json());
@@ -27,11 +28,11 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 
-app.use((err: any, req: Request, res: Response, next: Function) => {
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     console.error(err);  
     res.status(500).json({ error: 'Something went wrong' });
   });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

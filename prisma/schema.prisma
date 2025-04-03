@@ -20,54 +20,38 @@ enum Role {
 
 //Users
 model User {
-  id             String         @id @default(uuid())
-  name           String
-  email          String         @unique
-  password       String
-  role           Role           @default(BASIC)
-  orders         Order[]
-  addresses      Address[]
-  paymentMethods Payment[]
-  shoppingCart   Cart?
-  UserActivity   UserActivity[]
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      Role      @default(BASIC)
+  orders    Order[]
+  addresses Address[]
 }
 
 model Address {
-  id       String    @id @default(uuid())
-  street   String
-  city     String
-  state    String
-  zip      String
-  country  String
-  type     String
-  user     User      @relation(fields: [userId], references: [id])
-  userId   String
-  payments Payment[]
-}
-
-model Payment {
-  id               String   @id @default(uuid())
-  type             String
-  tokenizedId      String   @unique // Stores token instead of raw card details
-  provider         String
-  status           String   @default("Pending") // "Completed", "Failed"
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  billingAddress   Address? @relation(fields: [billingAddressId], references: [id])
-  billingAddressId String?
-  user             User     @relation(fields: [userId], references: [id])
-  userId           String
+  id      String  @id @default(uuid())
+  street  String
+  city    String
+  state   String
+  zip     String
+  country String
+  type    String
+  user    User?   @relation(fields: [userId], references: [id])
+  userId  String?
+  Order   Order[]
 }
 
 model Order {
   id         String       @id @default(uuid())
   items      OrderItems[]
-  user       User         @relation(fields: [userId], references: [id])
-  userId     String
+  user       User?        @relation(fields: [userId], references: [id])
+  userId     String?
   totalPrice Decimal
   status     String       @default("Pending")
   orderedAt  DateTime     @default(now())
-  Shipment   Shipment[]
+  address    Address      @relation(fields: [addressId], references: [id])
+  addressId  String
 }
 
 model OrderItems {
@@ -80,76 +64,13 @@ model OrderItems {
   price     Decimal
 }
 
-//Cart and Wishlist
-model Cart {
-  id         String      @id @default(uuid())
-  items      CartItems[]
-  totalPrice Decimal
-  user       User        @relation(fields: [userId], references: [id])
-  userId     String      @unique
-}
-
-model CartItems {
-  id        String  @id @default(uuid())
-  cart      Cart    @relation(fields: [cartId], references: [id])
-  cartId    String
-  product   Product @relation(fields: [productId], references: [id])
-  productId String
-  quantity  Int     @default(1)
-}
-
 model Product {
-  id                 String           @id @default(uuid())
+  id                 String       @id @default(uuid())
   name               String
   description        String
   price              String
   ratings            String
   reviews            String
   discountPercentage Decimal?
-  cartItems          CartItems[]
   orders             OrderItems[]
-  Inventory          Inventory?
-  ProductMetrics     ProductMetrics[]
-}
-
-model Inventory {
-  id        String  @id @default(uuid())
-  product   Product @relation(fields: [productId], references: [id])
-  productId String  @unique
-  quantity  Int     @default(0)
-}
-
-model Shipment {
-  id                String    @id @default(uuid())
-  order             Order     @relation(fields: [orderId], references: [id])
-  orderId           String
-  trackingId        String    @unique
-  carrier           String
-  status            String    @default("Processing") // "Shipped", "Delivered"
-  estimatedDelivery DateTime?
-}
-
-//Admin
-model SalesReport {
-  id          String   @id @default(uuid())
-  totalSales  Decimal  @default(0.0) // Total revenue
-  totalOrders Int      @default(0) // Number of orders
-  date        DateTime @unique @default(now())
-}
-
-model UserActivity {
-  id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  action    String // "Login", "Purchase", "Profile Update"
-  timestamp DateTime @default(now())
-}
-
-model ProductMetrics {
-  id          String   @id @default(uuid())
-  product     Product  @relation(fields: [productId], references: [id])
-  productId   String
-  views       Int      @default(0) // How many times it was viewed
-  purchases   Int      @default(0) // How many times it was bought
-  lastUpdated DateTime @updatedAt
 }
