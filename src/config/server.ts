@@ -6,6 +6,8 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 
+import userRouter from "../users/userAuthRoutes";
+
 
 dotenv.config()
 
@@ -22,6 +24,9 @@ app.use(rateLimit({
   max: 100, // limit each IP to 100 requests per windowMs
   message: 'Too many requests, please try again later.'
 }));
+
+
+app.use("/users", userRouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("API is running...");
