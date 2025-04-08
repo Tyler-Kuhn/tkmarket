@@ -1,6 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from 'cors';
-import prisma from "./db";
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import helmet from 'helmet';

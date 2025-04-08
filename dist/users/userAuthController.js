@@ -12,11 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.register = void 0;
+exports.getUser = exports.login = exports.register = void 0;
 const errMiddleware_1 = __importDefault(require("../errors/errMiddleware"));
 const appError_1 = __importDefault(require("../errors/appError"));
 const userAuthServices_1 = require("./userAuthServices");
 exports.register = (0, errMiddleware_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Incoming request:", req.body);
     const { name, email, password } = req.body;
     const newUser = yield (0, userAuthServices_1.registerUser)(name, email, password);
     if (!newUser) {
@@ -33,4 +34,12 @@ exports.login = (0, errMiddleware_1.default)((req, res, next) => __awaiter(void 
         next(error);
     }
     res.json({ token });
+}));
+exports.getUser = (0, errMiddleware_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user.userId;
+    const user = yield (0, userAuthServices_1.getUserById)(userId);
+    if (!user) {
+        const error = new appError_1.default("User not found", 404);
+    }
+    res.json(user);
 }));

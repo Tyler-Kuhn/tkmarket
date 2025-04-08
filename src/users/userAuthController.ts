@@ -3,7 +3,7 @@ import catchFunction from "../errors/errMiddleware";
 
 import AppError from "../errors/appError";
 
-import { registerUser, loginUser } from "./userAuthServices";
+import { registerUser, loginUser, getUserById } from "./userAuthServices";
 
 export const register = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -34,3 +34,17 @@ export const login = catchFunction(
     res.json({ token });
   }
 );
+
+export const getUser = catchFunction(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = (req as any).user.userId;
+
+    const user = await getUserById(userId);
+
+    if(!user){
+      const error = new AppError("User not found", 404);
+    }
+
+    res.json(user);
+  }
+)
