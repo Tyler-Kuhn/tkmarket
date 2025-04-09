@@ -3,7 +3,12 @@ import catchFunction from "../errors/errMiddleware";
 
 import AppError from "../errors/appError";
 
-import { registerUser, loginUser, getUserById } from "./userAuthServices";
+import {
+  registerUser,
+  loginUser,
+  getUserById,
+  updateUserById,
+} from "./userAuthServices";
 
 export const register = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -41,10 +46,26 @@ export const getUser = catchFunction(
 
     const user = await getUserById(userId);
 
-    if(!user){
+    if (!user) {
       const error = new AppError("User not found", 404);
     }
 
     res.json(user);
   }
-)
+);
+
+export const updateUser = catchFunction(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = (req as any).user.userId;
+    const { name, email } = req.body;
+
+    const updatedUser = await updateUserById(userId, name, email);
+
+    if(!updatedUser){
+      const error = new AppError("Could not update profile", 500)
+      next(error);
+    }
+
+    res.json(updateUser);
+  }
+);

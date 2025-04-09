@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserById = exports.loginUser = exports.registerUser = void 0;
+exports.updateUserById = exports.getUserById = exports.loginUser = exports.registerUser = void 0;
 const db_1 = __importDefault(require("../config/db"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -60,3 +60,10 @@ const getUserById = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.getUserById = getUserById;
+const updateUserById = (userId, name, email) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield db_1.default.user.update({
+        where: { id: userId },
+        data: { name, email }
+    });
+});
+exports.updateUserById = updateUserById;

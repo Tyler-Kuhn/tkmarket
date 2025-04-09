@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUser = exports.login = exports.register = void 0;
+exports.updateUser = exports.getUser = exports.login = exports.register = void 0;
 const errMiddleware_1 = __importDefault(require("../errors/errMiddleware"));
 const appError_1 = __importDefault(require("../errors/appError"));
 const userAuthServices_1 = require("./userAuthServices");
@@ -42,4 +42,14 @@ exports.getUser = (0, errMiddleware_1.default)((req, res, next) => __awaiter(voi
         const error = new appError_1.default("User not found", 404);
     }
     res.json(user);
+}));
+exports.updateUser = (0, errMiddleware_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user.userId;
+    const { name, email } = req.body;
+    const updatedUser = yield (0, userAuthServices_1.updateUserById)(userId, name, email);
+    if (!updatedUser) {
+        const error = new appError_1.default("Could not update profile", 500);
+        next(error);
+    }
+    res.json(exports.updateUser);
 }));
