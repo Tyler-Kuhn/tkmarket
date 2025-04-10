@@ -12,16 +12,15 @@ import {
 
 export const register = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log("Incoming request:", req.body);
     const { name, email, password } = req.body;
 
-    const newUser = await registerUser(name, email, password);
+    const newUserToken = await registerUser(name, email, password);
 
-    if (!newUser) {
+    if (!newUserToken) {
       const error = new AppError("Something went wrong", 500);
       next(error);
     }
-    res.status(201).json(newUser);
+    res.status(201).json(newUserToken);
   }
 );
 
@@ -61,8 +60,8 @@ export const updateUser = catchFunction(
 
     const updatedUser = await updateUserById(userId, name, email);
 
-    if(!updatedUser){
-      const error = new AppError("Could not update profile", 500)
+    if (!updatedUser) {
+      const error = new AppError("Could not update profile", 500);
       next(error);
     }
 

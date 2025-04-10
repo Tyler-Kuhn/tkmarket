@@ -3,9 +3,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import AppError from "../errors/appError";
 import { User } from "../config/interfaces";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const secretKey: string = process.env.SECRET_KEY || "defaultSecretKey";
 const saltRounds = 10;
@@ -29,7 +26,19 @@ export const registerUser = async (
     throw new AppError("Something went wrong", 500);
   }
 
-  return newUser;
+  const user: User | null = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    throw new AppError("Invalid Email", 400);
+  }
+
+  const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: "1h" });
+
+  return token;
 };
 
 export const loginUser = async (email: string, password: string) => {
@@ -61,10 +70,13 @@ export const getUserById = async (userId: string) => {
   });
 };
 
-
-export const updateUserById = async (userId: string, name?: string, email?: string) => {
+export const updateUserById = async (
+  userId: string,
+  name?: string,
+  email?: string
+) => {
   return await prisma.user.update({
-    where: {id: userId},
-    data: {name, email}
-  })
-}
+    where: { id: userId },
+    data: { name, email },
+  });
+};
