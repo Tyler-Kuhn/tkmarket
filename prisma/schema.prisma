@@ -69,8 +69,8 @@ model Product {
   name               String
   description        String
   price              String
-  ratings            String
-  reviews            String
+  ratings            String?
+  reviews            String?
   discountPercentage Decimal?
   orders             OrderItems[]
 }
