@@ -44,7 +44,7 @@ export const updateProduct = async (
   ratings?: string
 ) => {
   const updatedProduct = await prisma.product.update({
-    where: { id },
+    where: { id: parseInt(id) },
     data: { name, price, description, reviews, ratings},
   });
 
@@ -53,7 +53,7 @@ export const updateProduct = async (
 
 export const deleteProduct = async (id: string) => {
   const deletedProduct = await prisma.product.delete({
-    where: { id },
+    where: { id: parseInt(id) },
   });
 
   return deletedProduct;
