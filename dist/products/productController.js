@@ -31,19 +31,20 @@ exports.getProducts = (0, errMiddleware_1.default)((req, res, next) => __awaiter
         const error = new appError_1.default("Something went wrong", 500);
         next(error);
     }
-    res.status(201).json(productList);
+    res.status(200).json(productList);
 }));
 exports.getAproduct = (0, errMiddleware_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name } = req.body;
+    const { name } = req.params;
     const product = yield (0, productService_1.getProductByName)(name);
     if (!product) {
         const error = new appError_1.default("Product not found", 404);
         next(error);
     }
-    res.status(201).json(product);
+    res.status(200).json(product);
 }));
 exports.updateAProduct = (0, errMiddleware_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id, name, price, description, reviews, ratings } = req.body;
+    const { id } = req.params;
+    const { name, price, description, reviews, ratings } = req.body;
     const updatedProduct = yield (0, productService_1.updateProduct)(id, name, price, description, reviews, ratings);
     if (!updatedProduct) {
         const error = new appError_1.default("Unable to update product", 500);
@@ -52,7 +53,7 @@ exports.updateAProduct = (0, errMiddleware_1.default)((req, res, next) => __awai
     res.status(201).json(updatedProduct);
 }));
 exports.deleteAProduct = (0, errMiddleware_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.body;
+    const { id } = req.params;
     const deletedProduct = yield (0, productService_1.deleteProduct)(id);
     if (!deletedProduct) {
         const error = new appError_1.default("Product not found", 404);

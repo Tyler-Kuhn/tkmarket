@@ -35,13 +35,13 @@ export const getProducts = catchFunction(
       next(error);
     }
 
-    res.status(201).json(productList);
+    res.status(200).json(productList);
   }
 );
 
 export const getAproduct = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { name } = req.body;
+    const { name } = req.params;
 
     const product = await getProductByName(name);
 
@@ -50,13 +50,14 @@ export const getAproduct = catchFunction(
       next(error);
     }
 
-    res.status(201).json(product);
+    res.status(200).json(product);
   }
 );
 
 export const updateAProduct = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { id, name, price, description, reviews, ratings } = req.body;
+    const { id } = req.params;
+    const { name, price, description, reviews, ratings } = req.body;
 
     const updatedProduct = await updateProduct(
       id,
@@ -79,7 +80,7 @@ export const updateAProduct = catchFunction(
 export const deleteAProduct = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
 
-    const { id } = req.body;
+    const { id } = req.params;
 
     const deletedProduct = await deleteProduct(id);
 
