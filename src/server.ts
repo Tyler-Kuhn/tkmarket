@@ -7,7 +7,8 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 
 import userRouter from "./users/userAuthRoutes";
-import productRouters from "./products/productRoutes";
+import productsRouter from "./products/productRoutes";
+console.log("Product routes loaded");
 
 const app = express();
 const PORT = process.env.PORT;
@@ -24,8 +25,9 @@ app.use(
   })
 );
 
+app.use("/products", productsRouter);
 app.use("/users", userRouter);
-app.use("/products", productRouters);
+
 
 app.get("/", (req: Request, res: Response) => {
   res.send("API is running...");

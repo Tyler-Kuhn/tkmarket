@@ -12,6 +12,7 @@ const helmet_1 = __importDefault(require("helmet"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const userAuthRoutes_1 = __importDefault(require("./users/userAuthRoutes"));
 const productRoutes_1 = __importDefault(require("./products/productRoutes"));
+console.log("Product routes loaded");
 const app = (0, express_1.default)();
 const PORT = process.env.PORT;
 app.use(express_1.default.json());
@@ -23,8 +24,8 @@ app.use((0, express_rate_limit_1.default)({
     max: 100, // limit each IP to 100 requests per windowMs
     message: "Too many requests, please try again later.",
 }));
-app.use("/users", userAuthRoutes_1.default);
 app.use("/products", productRoutes_1.default);
+app.use("/users", userAuthRoutes_1.default);
 app.get("/", (req, res) => {
     res.send("API is running...");
 });

@@ -6,7 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const productController_1 = require("./productController");
 const router = express_1.default.Router();
-router.post("/create", productController_1.createAProduct);
+router.get("/test", (req, res) => {
+    res.send("Product routes working");
+});
+router.post("/create", (req, res, next) => {
+    console.log("Create route hit"); // <-- does this show up?
+    next();
+}, productController_1.createAProduct);
 router.get("/allProducts", productController_1.getProducts);
 router.get("/product/:name", productController_1.getAproduct);
 router.put("/update/:id", productController_1.updateAProduct);

@@ -9,7 +9,14 @@ import {
 
 const router = express.Router();
 
-router.post("/create", createAProduct);
+router.get("/test", (req, res) => {
+  res.send("Product routes working");
+});
+
+router.post("/create", (req, res, next) => {
+  console.log("Create route hit"); // <-- does this show up?
+  next();
+}, createAProduct);
 
 router.get("/allProducts", getProducts);
 
@@ -19,4 +26,4 @@ router.put("/update/:id", updateAProduct);
 
 router.delete("/delete/:id", deleteAProduct);
 
-export default router;
+export default router

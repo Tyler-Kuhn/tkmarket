@@ -17,6 +17,7 @@ const errMiddleware_1 = __importDefault(require("../errors/errMiddleware"));
 const productService_1 = require("./productService");
 const appError_1 = __importDefault(require("../errors/appError"));
 exports.createAProduct = (0, errMiddleware_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("Create route hit");
     const { name, price, description } = req.body;
     const newProduct = yield (0, productService_1.createProduct)(name, price, description);
     if (!newProduct) {

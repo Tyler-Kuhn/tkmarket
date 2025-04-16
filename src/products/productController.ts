@@ -12,6 +12,7 @@ import AppError from "../errors/appError";
 
 export const createAProduct = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
+    console.log("Create route hit");
     const { name, price, description } = req.body;
 
     const newProduct = await createProduct(name, price, description);
