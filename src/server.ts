@@ -8,7 +8,7 @@ import rateLimit from "express-rate-limit";
 
 import userRouter from "./users/userAuthRoutes";
 import productsRouter from "./products/productRoutes";
-console.log("Product routes loaded");
+
 
 const app = express();
 const PORT = process.env.PORT;
@@ -24,6 +24,7 @@ app.use(
     message: "Too many requests, please try again later.",
   })
 );
+
 
 app.use("/products", productsRouter);
 app.use("/users", userRouter);

@@ -12,7 +12,6 @@ const helmet_1 = __importDefault(require("helmet"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const userAuthRoutes_1 = __importDefault(require("./users/userAuthRoutes"));
 const productRoutes_1 = __importDefault(require("./products/productRoutes"));
-console.log("Product routes loaded");
 const app = (0, express_1.default)();
 const PORT = process.env.PORT;
 app.use(express_1.default.json());

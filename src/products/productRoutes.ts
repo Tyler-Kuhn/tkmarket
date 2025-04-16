@@ -9,14 +9,9 @@ import {
 
 const router = express.Router();
 
-router.get("/test", (req, res) => {
-  res.send("Product routes working");
-});
 
-router.post("/create", (req, res, next) => {
-  console.log("Create route hit"); // <-- does this show up?
-  next();
-}, createAProduct);
+
+router.post("/create", createAProduct);
 
 router.get("/allProducts", getProducts);
 
