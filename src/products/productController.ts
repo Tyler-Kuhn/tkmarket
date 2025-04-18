@@ -4,7 +4,7 @@ import catchFunction from "../errors/errMiddleware";
 import {
   createProduct,
   getAllProducts,
-  getProductByName,
+  getProductById,
   updateProduct,
   deleteProduct,
 } from "./productService";
@@ -15,12 +15,13 @@ export const createAProduct = catchFunction(
     
     const { name, price, description } = req.body;
 
-    const newProduct = await createProduct(name, price, description);
-
-    if (!newProduct) {
+    if (!name || !price || !description){
       const error = new AppError("Something wnet wrong", 500);
       next(error);
     }
+
+    const newProduct = await createProduct(name, price, description);
+
 
     res.status(201).json({ Message: "New Product Created", newProduct });
   }
@@ -30,20 +31,15 @@ export const getProducts = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
     const productList = await getAllProducts();
 
-    if (!productList) {
-      const error = new AppError("Something went wrong", 500);
-      next(error);
-    }
-
     res.status(200).json(productList);
   }
 );
 
 export const getAproduct = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { name } = req.params;
+    const { id } = req.params;
 
-    const product = await getProductByName(name);
+    const product = await getProductById(parseInt(id));
 
     if (!product) {
       const error = new AppError("Product not found", 404);
@@ -59,19 +55,19 @@ export const updateAProduct = catchFunction(
     const { id } = req.params;
     const { name, price, description, reviews, ratings } = req.body;
 
+    if(!id){
+      const error = new AppError("Unable to update product", 500);
+      next(error);
+    }
+
     const updatedProduct = await updateProduct(
-      id,
+      parseInt(id),
       name,
       price,
       description,
       reviews,
       ratings
     );
-
-    if (!updatedProduct) {
-      const error = new AppError("Unable to update product", 500);
-      next(error);
-    }
 
     res.status(201).json(updatedProduct)
   }
@@ -82,13 +78,8 @@ export const deleteAProduct = catchFunction(
 
     const { id } = req.params;
 
-    const deletedProduct = await deleteProduct(id);
+    const deletedProduct = await deleteProduct(parseInt(id));
 
-    if(!deletedProduct){
-        const error = new AppError("Product not found", 404);
-      next(error);
-    }
-
-    res.status(201).json({Message: "Product deleted", deletedProduct})
+    res.status(200).json({Message: "Product deleted", deletedProduct})
   }
 );
