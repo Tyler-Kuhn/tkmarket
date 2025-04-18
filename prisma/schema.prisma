@@ -30,7 +30,7 @@ model User {
 }
 
 model Address {
-  id      String  @id @default(uuid())
+  id      Int     @id @default(autoincrement())
   street  String
   city    String
   state   String
@@ -43,7 +43,7 @@ model Address {
 }
 
 model Order {
-  id         String       @id @default(uuid())
+  id         Int          @id @default(autoincrement())
   items      OrderItems[]
   user       User?        @relation(fields: [userId], references: [id])
   userId     String?
@@ -51,26 +51,26 @@ model Order {
   status     String       @default("Pending")
   orderedAt  DateTime     @default(now())
   address    Address      @relation(fields: [addressId], references: [id])
-  addressId  String
+  addressId  Int
 }
 
 model OrderItems {
-  id        String  @id @default(uuid())
+  id        Int     @id @default(autoincrement())
   order     Order   @relation(fields: [orderId], references: [id])
-  orderId   String
+  orderId   Int
   product   Product @relation(fields: [productId], references: [id])
-  productId String
+  productId Int
   quantity  Int     @default(1)
   price     Decimal
 }
 
 model Product {
-  id                 String       @id @default(uuid())
+  id                 Int          @id @default(autoincrement())
   name               String
   description        String
   price              String
-  ratings            String
-  reviews            String
+  ratings            String?
+  reviews            String?
   discountPercentage Decimal?
   orders             OrderItems[]
 }

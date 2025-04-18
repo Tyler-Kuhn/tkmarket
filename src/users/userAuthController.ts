@@ -47,6 +47,7 @@ export const getUser = catchFunction(
 
     if (!user) {
       const error = new AppError("User not found", 404);
+      next(error);
     }
 
     res.json(user);
@@ -60,11 +61,7 @@ export const updateUser = catchFunction(
 
     const updatedUser = await updateUserById(userId, name, email);
 
-    if (!updatedUser) {
-      const error = new AppError("Could not update profile", 500);
-      next(error);
-    }
 
-    res.json(updateUser);
+    res.json(updatedUser);
   }
 );

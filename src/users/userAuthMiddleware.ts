@@ -2,9 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import catchFunction from "../errors/errMiddleware";
 import AppError from "../errors/appError";
-import dotenv from "dotenv";
 
-dotenv.config();
 
 const secretKey: string = process.env.SECRET_KEY || "defaultSecretKey";
 
