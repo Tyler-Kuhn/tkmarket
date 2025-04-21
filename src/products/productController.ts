@@ -16,7 +16,7 @@ export const createAProduct = catchFunction(
     const { name, price, description } = req.body;
 
     if (!name || !price || !description){
-      const error = new AppError("Something wnet wrong", 500);
+      const error = new AppError("Missing required fields", 400);
       next(error);
     }
 
@@ -56,7 +56,7 @@ export const updateAProduct = catchFunction(
     const { name, price, description, reviews, ratings } = req.body;
 
     if(!id){
-      const error = new AppError("Unable to update product", 500);
+      const error = new AppError("Missing product ID", 400);
       next(error);
     }
 
@@ -77,6 +77,11 @@ export const deleteAProduct = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
 
     const { id } = req.params;
+
+    if(!id){
+      const error = new AppError("Missing product ID", 400);
+      next(error);
+    }
 
     const deletedProduct = await deleteProduct(parseInt(id));
 

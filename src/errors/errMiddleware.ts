@@ -5,3 +5,10 @@ export default function catchFunction(fn: Function) {
     fn(req, res, next).catch(next);
   };
 }
+
+
+
+
+
+
+

@@ -14,6 +14,11 @@ export const register = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
     const { name, email, password } = req.body;
 
+    if (!name || !email || !password) {
+      const error = new AppError("Missing required fields", 400);
+      next(error);
+    }
+
     const newUserToken = await registerUser(name, email, password);
 
     if (!newUserToken) {
@@ -27,6 +32,11 @@ export const register = catchFunction(
 export const login = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      const error = new AppError("Missing required fields", 400);
+      next(error);
+    }
 
     const token = await loginUser(email, password);
 

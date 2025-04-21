@@ -14,7 +14,7 @@ export const registerUser = async (
 ) => {
   const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-  const newUser = await prisma.user.create({
+  await prisma.user.create({
     data: {
       name,
       email,
@@ -22,9 +22,6 @@ export const registerUser = async (
     },
   });
 
-  if (!newUser) {
-    throw new AppError("Something went wrong", 500);
-  }
 
   const user: User | null = await prisma.user.findUnique({
     where: {
