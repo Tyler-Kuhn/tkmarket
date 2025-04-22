@@ -2,10 +2,10 @@
   "name": "ecommerce",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon dist/config/server.js",
+    "dev": "nodemon dist/server.js",
     "build": "tsc",
     "start": "node dist/server.js"
   },

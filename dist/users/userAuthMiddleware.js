@@ -16,8 +16,6 @@ exports.authenticateToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const errMiddleware_1 = __importDefault(require("../errors/errMiddleware"));
 const appError_1 = __importDefault(require("../errors/appError"));
-const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
 const secretKey = process.env.SECRET_KEY || "defaultSecretKey";
 exports.authenticateToken = (0, errMiddleware_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const authHeader = req.headers["authorization"];

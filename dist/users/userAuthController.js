@@ -17,14 +17,13 @@ const errMiddleware_1 = __importDefault(require("../errors/errMiddleware"));
 const appError_1 = __importDefault(require("../errors/appError"));
 const userAuthServices_1 = require("./userAuthServices");
 exports.register = (0, errMiddleware_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("Incoming request:", req.body);
     const { name, email, password } = req.body;
-    const newUser = yield (0, userAuthServices_1.registerUser)(name, email, password);
-    if (!newUser) {
+    const newUserToken = yield (0, userAuthServices_1.registerUser)(name, email, password);
+    if (!newUserToken) {
         const error = new appError_1.default("Something went wrong", 500);
         next(error);
     }
-    res.status(201).json(newUser);
+    res.status(201).json(newUserToken);
 }));
 exports.login = (0, errMiddleware_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;

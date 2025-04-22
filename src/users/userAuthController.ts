@@ -14,6 +14,11 @@ export const register = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
     const { name, email, password } = req.body;
 
+    if (!name || !email || !password) {
+      const error = new AppError("Missing required fields", 400);
+      next(error);
+    }
+
     const newUserToken = await registerUser(name, email, password);
 
     if (!newUserToken) {
@@ -27,6 +32,11 @@ export const register = catchFunction(
 export const login = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      const error = new AppError("Missing required fields", 400);
+      next(error);
+    }
 
     const token = await loginUser(email, password);
 
@@ -47,6 +57,7 @@ export const getUser = catchFunction(
 
     if (!user) {
       const error = new AppError("User not found", 404);
+      next(error);
     }
 
     res.json(user);
@@ -60,11 +71,7 @@ export const updateUser = catchFunction(
 
     const updatedUser = await updateUserById(userId, name, email);
 
-    if (!updatedUser) {
-      const error = new AppError("Could not update profile", 500);
-      next(error);
-    }
 
-    res.json(updateUser);
+    res.json(updatedUser);
   }
 );

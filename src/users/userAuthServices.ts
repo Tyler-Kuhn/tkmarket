@@ -14,7 +14,7 @@ export const registerUser = async (
 ) => {
   const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-  const newUser = await prisma.user.create({
+  await prisma.user.create({
     data: {
       name,
       email,
@@ -22,9 +22,6 @@ export const registerUser = async (
     },
   });
 
-  if (!newUser) {
-    throw new AppError("Something went wrong", 500);
-  }
 
   const user: User | null = await prisma.user.findUnique({
     where: {
@@ -49,13 +46,13 @@ export const loginUser = async (email: string, password: string) => {
   });
 
   if (!user) {
-    throw new AppError("Invalid Email", 400);
+    throw new AppError("Email doesn't match an account", 400);
   }
 
   const validPassword = await bcrypt.compare(password, user.password);
 
   if (!validPassword) {
-    throw new AppError("Invalid password", 400);
+    throw new AppError("Password doesn't match", 400);
   }
 
   const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: "1h" });

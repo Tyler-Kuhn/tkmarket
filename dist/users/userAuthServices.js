@@ -17,8 +17,6 @@ const db_1 = __importDefault(require("../config/db"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const appError_1 = __importDefault(require("../errors/appError"));
-const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
 const secretKey = process.env.SECRET_KEY || "defaultSecretKey";
 const saltRounds = 10;
 const registerUser = (name, email, password) => __awaiter(void 0, void 0, void 0, function* () {
@@ -33,7 +31,16 @@ const registerUser = (name, email, password) => __awaiter(void 0, void 0, void 0
     if (!newUser) {
         throw new appError_1.default("Something went wrong", 500);
     }
-    return newUser;
+    const user = yield db_1.default.user.findUnique({
+        where: {
+            email,
+        },
+    });
+    if (!user) {
+        throw new appError_1.default("Invalid Email", 400);
+    }
+    const token = jsonwebtoken_1.default.sign({ userId: user.id }, secretKey, { expiresIn: "1h" });
+    return token;
 });
 exports.registerUser = registerUser;
 const loginUser = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
@@ -63,7 +70,7 @@ exports.getUserById = getUserById;
 const updateUserById = (userId, name, email) => __awaiter(void 0, void 0, void 0, function* () {
     return yield db_1.default.user.update({
         where: { id: userId },
-        data: { name, email }
+        data: { name, email },
     });
 });
 exports.updateUserById = updateUserById;
