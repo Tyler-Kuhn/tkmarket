@@ -35,8 +35,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("API is running...");
 });
 
-app.use(prismaErrorHandler as ErrorRequestHandler);
-app.use(globalErrorHandler as unknown as ErrorRequestHandler); 
+app.use([prismaErrorHandler, globalErrorHandler]);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
