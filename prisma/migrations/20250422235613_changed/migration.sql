@@ -14,7 +14,7 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "Address" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "street" TEXT NOT NULL,
     "city" TEXT NOT NULL,
     "state" TEXT NOT NULL,
@@ -28,21 +28,21 @@ CREATE TABLE "Address" (
 
 -- CreateTable
 CREATE TABLE "Order" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "userId" TEXT,
     "totalPrice" DECIMAL(65,30) NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'Pending',
     "orderedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "addressId" TEXT NOT NULL,
+    "addressId" INTEGER NOT NULL,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "OrderItems" (
-    "id" TEXT NOT NULL,
-    "orderId" TEXT NOT NULL,
-    "productId" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "orderId" INTEGER NOT NULL,
+    "productId" INTEGER NOT NULL,
     "quantity" INTEGER NOT NULL DEFAULT 1,
     "price" DECIMAL(65,30) NOT NULL,
 
@@ -51,12 +51,12 @@ CREATE TABLE "OrderItems" (
 
 -- CreateTable
 CREATE TABLE "Product" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "price" TEXT NOT NULL,
-    "ratings" TEXT NOT NULL,
-    "reviews" TEXT NOT NULL,
+    "ratings" TEXT,
+    "reviews" TEXT,
     "discountPercentage" DECIMAL(65,30),
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")

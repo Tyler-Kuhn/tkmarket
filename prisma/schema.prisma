@@ -20,7 +20,7 @@ enum Role {
 
 //Users
 model User {
-  id        String    @id @default(uuid())
+  id        Int       @id @default(autoincrement())
   name      String
   email     String    @unique
   password  String
@@ -37,16 +37,16 @@ model Address {
   zip     String
   country String
   type    String
-  user    User?   @relation(fields: [userId], references: [id])
-  userId  String?
+  user    User    @relation(fields: [userId], references: [id])
+  userId  Int
   Order   Order[]
 }
 
 model Order {
   id         Int          @id @default(autoincrement())
   items      OrderItems[]
-  user       User?        @relation(fields: [userId], references: [id])
-  userId     String?
+  user       User         @relation(fields: [userId], references: [id])
+  userId     Int
   totalPrice Decimal
   status     String       @default("Pending")
   orderedAt  DateTime     @default(now())
