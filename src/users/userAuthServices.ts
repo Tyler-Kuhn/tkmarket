@@ -60,7 +60,7 @@ export const loginUser = async (email: string, password: string) => {
   return token;
 };
 
-export const getUserById = async (userId: string) => {
+export const getUserById = async (userId: number) => {
   return await prisma.user.findUnique({
     where: { id: userId },
     select: { id: true, name: true, email: true },
@@ -68,7 +68,7 @@ export const getUserById = async (userId: string) => {
 };
 
 export const updateUserById = async (
-  userId: string,
+  userId: number,
   name?: string,
   email?: string
 ) => {
