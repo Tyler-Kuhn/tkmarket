@@ -20,7 +20,7 @@ export const addAddress = catchFunction(
         next(error);
     }
 
-    const addressInfo = [street, city, state, zip, country, type];
+    const addressInfo = {street, city, state, zip, country, type};
 
     await createAddress(parseInt(userId), addressInfo);
 
