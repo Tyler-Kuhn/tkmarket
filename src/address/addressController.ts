@@ -58,7 +58,7 @@ export const updateAddress = catchFunction(
 
         await updateUserAddress(parseInt(userId), parseInt(addressId), street, city, state, zip, country, type )
 
-        res.status(201).json("Address Updated");
+        res.status(200).json("Address Updated");
     }
 )
 
