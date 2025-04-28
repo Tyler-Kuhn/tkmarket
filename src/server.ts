@@ -1,15 +1,20 @@
-import express, { Request, Response, NextFunction, ErrorRequestHandler } from "express";
+import express, {
+  Request,
+  Response,
+  NextFunction,
+  ErrorRequestHandler,
+} from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
 import morgan from "morgan";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import  globalErrorHandler from "./errors/globalErrors";
+import globalErrorHandler from "./errors/globalErrors";
 import prismaErrorHandler from "./errors/prismaErrors";
 import userRouter from "./users/userAuthRoutes";
 import productsRouter from "./products/productRoutes";
-
+import addressRouter from "./address/addressRoutes";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -26,10 +31,9 @@ app.use(
   })
 );
 
-
 app.use("/products", productsRouter);
 app.use("/users", userRouter);
-
+app.use("/address", addressRouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("API is running...");
