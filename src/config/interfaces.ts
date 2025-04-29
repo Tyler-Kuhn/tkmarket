@@ -7,3 +7,9 @@ export interface User {
     password: string;
     role: $Enums.Role;
   }
+
+  export interface OrderItemInput {
+    productId: number,
+    quantity: number,
+    price: number
+  }
