@@ -1,6 +1,8 @@
+import { Prisma } from "@prisma/client";
 import prisma from "../config/db";
 import { OrderItemInput } from "../config/interfaces";
 
+// CREATE
 export const createOrderWithItems = async (
   userId: number,
   addressId: number,
@@ -27,6 +29,7 @@ export const createOrderWithItems = async (
       },
       include: {
         items: true,
+        address: true,
       },
     });
 
@@ -34,34 +37,49 @@ export const createOrderWithItems = async (
   });
 };
 
+// READ
 export const getUserOrders = async (userId: number) => {
-  const orders = await prisma.order.findMany({
+  return await prisma.order.findMany({
     where: { userId },
-    include: { items: true },
+    include: {
+      items: true,
+      address: true,
+    },
+    orderBy: { orderedAt: "desc" },
   });
-
-  return orders;
 };
 
 export const getOrderById = async (userId: number, orderId: number) => {
-  const order = await prisma.order.findUnique({
-    where: { userId, id: orderId },
-    include: { items: true },
+  return await prisma.order.findFirst({
+    where: { id: orderId, userId },
+    include: {
+      items: true,
+      address: true,
+    },
   });
-
-  return order;
 };
 
+// UPDATE
 export const updateOrderWithItems = async (
   orderId: number,
   userId: number,
-  data: { status?: string; addressId?: number; items?: OrderItemInput[] }
+  data: {
+    status?: string;
+    addressId?: number;
+    items?: OrderItemInput[];
+  }
 ) => {
   return await prisma.$transaction(async (tx) => {
-    const existingOrder = prisma.order.findUnique({
-      where: { userId, id: orderId },
+    const existingOrder = await tx.order.findUnique({
+      where: { id: orderId },
       include: { items: true },
     });
+
+    if (!existingOrder || existingOrder.userId !== userId) {
+      throw new Error("Order not found or unauthorized.");
+    }
+
+    let newTotalPrice = existingOrder.totalPrice;
 
     if (data.items) {
       await tx.orderItems.deleteMany({
@@ -77,15 +95,9 @@ export const updateOrderWithItems = async (
         })),
       });
 
-      const newTotal = data.items.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
+      newTotalPrice = new Prisma.Decimal(
+        data.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
       );
-
-      await tx.order.update({
-        where: { id: orderId },
-        data: { totalPrice: newTotal },
-      });
     }
 
     const updatedOrder = await tx.order.update({
@@ -93,11 +105,40 @@ export const updateOrderWithItems = async (
       data: {
         status: data.status,
         addressId: data.addressId,
+        totalPrice: newTotalPrice,
       },
       include: {
         items: true,
+        address: true,
       },
     });
+
     return updatedOrder;
+  });
+};
+
+// DELETE
+export const deleteOrderWithItems = async (
+  orderId: number,
+  userId: number
+) => {
+  return await prisma.$transaction(async (tx) => {
+    const existingOrder = await tx.order.findUnique({
+      where: { id: orderId },
+    });
+
+    if (!existingOrder || existingOrder.userId !== userId) {
+      throw new Error("Order not found or unauthorized.");
+    }
+
+    await tx.orderItems.deleteMany({
+      where: { orderId },
+    });
+
+    await tx.order.delete({
+      where: { id: orderId },
+    });
+
+    return { message: "Order deleted successfully." };
   });
 };
