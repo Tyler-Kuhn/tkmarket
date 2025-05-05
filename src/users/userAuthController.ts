@@ -51,7 +51,7 @@ export const login = catchFunction(
 
 export const getUser = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = (req as any).user.userId;
+    const userId = req.user?.userId;
 
     const user = await getUserById(parseInt(userId));
 
@@ -66,7 +66,7 @@ export const getUser = catchFunction(
 
 export const updateUser = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = (req as any).user.userId;
+    const userId = req.user?.userId;
     const { name, email } = req.body;
 
     const updatedUser = await updateUserById(parseInt(userId), name, email);

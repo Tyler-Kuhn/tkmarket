@@ -23,7 +23,7 @@ export const authenticateToken = catchFunction(
             next(error);
         }
 
-        (req as any).user = user
+        req.user = user
         next()
       });
     }

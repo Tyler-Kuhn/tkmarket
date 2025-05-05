@@ -11,7 +11,7 @@ import {
 
 export const addOrder = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = parseInt((req as any).user.userId);
+    const userId = parseInt(req.user?.userId);
     const { addressId, items } = req.body;
 
     if (!userId) {
@@ -35,7 +35,7 @@ export const addOrder = catchFunction(
 
 export const getOrders = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = parseInt((req as any).user.userId);
+    const userId = parseInt(req.user?.userId);
 
     if (!userId) {
       const error = new AppError("Unautorized", 403);
@@ -50,7 +50,7 @@ export const getOrders = catchFunction(
 
 export const getOrder = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = parseInt((req as any).user.userId);
+    const userId = parseInt(req.user?.userId);
     const orderId = parseInt(req.params.id);
 
     if (!userId) {
@@ -66,7 +66,7 @@ export const getOrder = catchFunction(
 
 export const updateOrder = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = parseInt((req as any).user.userId);
+    const userId = parseInt(req.user?.userId);
     const orderId = parseInt(req.params.id);
 
     if (!userId) {
@@ -93,7 +93,7 @@ export const updateOrder = catchFunction(
 
 export const deleteOrder = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = (req as any).user?.userId;
+    const userId = req.user?.userId;
     const orderId = parseInt(req.params.id);
 
     if (!userId) {
