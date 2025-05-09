@@ -23,7 +23,7 @@ export const registerUser = async (
   });
 
 
-  const user: User | null = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: {
       email,
     },
@@ -39,7 +39,7 @@ export const registerUser = async (
 };
 
 export const loginUser = async (email: string, password: string) => {
-  const user: User | null = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: {
       email,
     },

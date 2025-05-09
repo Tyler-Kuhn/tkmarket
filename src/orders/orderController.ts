@@ -11,7 +11,7 @@ import {
 
 export const addOrder = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = parseInt(req.user?.userId);
+    const userId = req.user?.userId;
     const { addressId, items } = req.body;
 
     if (!userId) {
@@ -19,7 +19,13 @@ export const addOrder = catchFunction(
       next(error);
     }
 
-    if (!addressId || items || !Array.isArray(items) || items.length === 0) {
+    if (typeof userId !== "number") {
+      const error = new AppError("Unauthorized", 401);
+      return next(error);
+    }
+    
+
+    if (!addressId || !items || !Array.isArray(items) || items.length === 0) {
       const error = new AppError("Missing addressId or items", 400);
       next(error);
     }
@@ -35,13 +41,18 @@ export const addOrder = catchFunction(
 
 export const getOrders = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = parseInt(req.user?.userId);
+    const userId = req.user?.userId;
 
     if (!userId) {
       const error = new AppError("Unautorized", 403);
       next(error);
     }
 
+    if (typeof userId !== "number") {
+      const error = new AppError("Unauthorized", 401);
+      return next(error);
+    }
+    
     const orders = await getUserOrders(userId);
 
     res.status(200).json(orders);
@@ -50,7 +61,14 @@ export const getOrders = catchFunction(
 
 export const getOrder = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = parseInt(req.user?.userId);
+    const userId = req.user?.userId;
+
+    if (typeof userId !== "number") {
+      const error = new AppError("Unauthorized", 401);
+      return next(error);
+    }
+    
+
     const orderId = parseInt(req.params.id);
 
     if (!userId) {
@@ -66,13 +84,19 @@ export const getOrder = catchFunction(
 
 export const updateOrder = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = parseInt(req.user?.userId);
+    const userId = req.user?.userId;
     const orderId = parseInt(req.params.id);
 
     if (!userId) {
       const error = new AppError("Unautorized", 403);
       next(error);
     }
+
+    if (typeof userId !== "number") {
+      const error = new AppError("Unauthorized", 401);
+      return next(error);
+    }
+    
 
     if (!orderId || isNaN(orderId)) {
       const error = new AppError("Invalid order ID", 400);
@@ -100,6 +124,12 @@ export const deleteOrder = catchFunction(
       const error = new AppError("Unautorized", 403);
       next(error);
     }
+
+    if (typeof userId !== "number") {
+      const error = new AppError("Unauthorized", 401);
+      return next(error);
+    }
+    
 
     if (!orderId || isNaN(orderId)) {
       const error = new AppError("Invalid order ID", 400);

@@ -17,14 +17,20 @@ export const authenticateToken = catchFunction(
     }
 
     if (token) {
-      jwt.verify(token, secretKey, (err, user) => {
-        if(err){
-            const error = new AppError("Invalid Token", 403);
-            next(error);
+      jwt.verify(token, secretKey, (err, decoded) => {
+        if (err) {
+          const error = new AppError("Invalid Token", 403);
+          return next(error);
         }
-
-        req.user = user
-        next()
+      
+        
+        if (typeof decoded === "object" && decoded !== null && "userId" in decoded) {
+          req.user = { userId: decoded.userId as number };
+          return next();
+        }
+      
+        const error = new AppError("Invalid Token Payload", 403);
+        next(error);
       });
     }
   }
