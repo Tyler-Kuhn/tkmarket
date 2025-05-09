@@ -51,9 +51,15 @@ export const login = catchFunction(
 
 export const getUser = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = (req as any).user.userId;
+    const userId = req.user?.userId;
 
-    const user = await getUserById(parseInt(userId));
+    if (typeof userId !== "number") {
+      const error = new AppError("Unauthorized", 401);
+      return next(error);
+    }
+    
+
+    const user = await getUserById(userId);
 
     if (!user) {
       const error = new AppError("User not found", 404);
@@ -66,10 +72,16 @@ export const getUser = catchFunction(
 
 export const updateUser = catchFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = (req as any).user.userId;
+    const userId = req.user?.userId;
+
+    if (typeof userId !== "number") {
+      const error = new AppError("Unauthorized", 401);
+      return next(error);
+    }
+    
     const { name, email } = req.body;
 
-    const updatedUser = await updateUserById(parseInt(userId), name, email);
+    const updatedUser = await updateUserById(userId, name, email);
 
 
     res.status(201).json(updatedUser);

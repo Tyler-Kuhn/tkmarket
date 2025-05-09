@@ -15,6 +15,7 @@ import prismaErrorHandler from "./errors/prismaErrors";
 import userRouter from "./users/userAuthRoutes";
 import productsRouter from "./products/productRoutes";
 import addressRouter from "./address/addressRoutes";
+import orderRouter from "./orders/orderRoutes";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -34,6 +35,7 @@ app.use(
 app.use("/products", productsRouter);
 app.use("/users", userRouter);
 app.use("/address", addressRouter);
+app.use("/orders", orderRouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("API is running...");

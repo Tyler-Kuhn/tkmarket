@@ -6,6 +6,7 @@ export interface User {
     email: string;
     password: string;
     role: $Enums.Role;
+    userId: number;
   }
 
   export interface OrderItemInput {
