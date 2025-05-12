@@ -1,16 +1,16 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../config/db";
-import { OrderItemInput } from "../config/interfaces";
+import { OrderItems } from "@prisma/client";
 
 // CREATE
 export const createOrderWithItems = async (
   userId: number,
   addressId: number,
-  items: OrderItemInput[]
+  items: OrderItems[]
 ) => {
   return await prisma.$transaction(async (tx) => {
     const totalPrice = items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
+      (sum, item) => sum + Number(item.price) * item.quantity,
       0
     );
 
@@ -66,7 +66,7 @@ export const updateOrderWithItems = async (
   data: {
     status?: string;
     addressId?: number;
-    items?: OrderItemInput[];
+    items?: OrderItems[];
   }
 ) => {
   return await prisma.$transaction(async (tx) => {
@@ -82,21 +82,64 @@ export const updateOrderWithItems = async (
     let newTotalPrice = existingOrder.totalPrice;
 
     if (data.items) {
-      await tx.orderItems.deleteMany({
+      const existingItems = await tx.orderItems.findMany({
         where: { orderId },
       });
 
-      await tx.orderItems.createMany({
-        data: data.items.map((item) => ({
-          orderId,
-          productId: item.productId,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-      });
+      const existingMap = new Map(
+        existingItems.map((item) => [`${item.productId}`, item])
+      );
 
+      const newMap = new Map(
+        data.items.map((item) => [`${item.productId}`, item])
+      );
+
+      const toCreate = data.items.filter(
+        (item) => !existingMap.has(`${item.productId}`)
+      );
+      const toUpdate = data.items.filter((item) => {
+        const existing = existingMap.get(`${item.productId}`);
+        return (
+          existing &&
+          (existing.quantity !== item.quantity || existing.price !== item.price)
+        );
+      });
+      const toDelete = existingItems.filter(
+        (item) => !newMap.has(`${item.productId}`)
+      );
+
+      for (const item of toDelete) {
+        await tx.orderItems.delete({
+          where: { id: item.id },
+        });
+      }
+
+      for (const item of toUpdate) {
+        const existing = existingMap.get(`${item.productId}`);
+        await tx.orderItems.update({
+          where: { id: existing!.id },
+          data: {
+            quantity: item.quantity,
+            price: item.price,
+          },
+        });
+      }
+
+      if (toCreate.length > 0) {
+        await tx.orderItems.createMany({
+          data: toCreate.map((item) => ({
+            orderId,
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        });
+      }
       newTotalPrice = new Prisma.Decimal(
-        data.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+        data.items.reduce(
+          (sum, item) => sum + Number(item.price) * item.quantity,
+          0
+        )
       );
     }
 
@@ -118,10 +161,7 @@ export const updateOrderWithItems = async (
 };
 
 // DELETE
-export const deleteOrderWithItems = async (
-  orderId: number,
-  userId: number
-) => {
+export const deleteOrderWithItems = async (orderId: number, userId: number) => {
   return await prisma.$transaction(async (tx) => {
     const existingOrder = await tx.order.findUnique({
       where: { id: orderId },
@@ -130,10 +170,6 @@ export const deleteOrderWithItems = async (
     if (!existingOrder || existingOrder.userId !== userId) {
       throw new Error("Order not found or unauthorized.");
     }
-
-    await tx.orderItems.deleteMany({
-      where: { orderId },
-    });
 
     await tx.order.delete({
       where: { id: orderId },

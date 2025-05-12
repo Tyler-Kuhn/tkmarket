@@ -2,7 +2,6 @@ import prisma from "../config/db";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import AppError from "../errors/appError";
-import { User } from "../config/interfaces";
 
 const secretKey: string = process.env.SECRET_KEY || "defaultSecretKey";
 const saltRounds = 10;
