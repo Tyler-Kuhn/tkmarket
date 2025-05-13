@@ -9,8 +9,34 @@ export const createOrderWithItems = async (
   items: OrderItems[]
 ) => {
   return await prisma.$transaction(async (tx) => {
-    const totalPrice = items.reduce(
-      (sum, item) => sum + Number(item.price) * item.quantity,
+    
+    const productIds = items.map((item) => item.productId);
+    const products = await tx.product.findMany({
+      where: { id: { in: productIds } },
+      select: { id: true, price: true },
+    });
+
+   
+    const priceMap = new Map<number, number>();
+    for (const product of products) {
+      priceMap.set(product.id, Number(product.price));
+    }
+
+    
+    const itemsWithPrice = items.map((item) => {
+      const price = priceMap.get(item.productId);
+      if (price === undefined) {
+        throw new Error(`Product with ID ${item.productId} not found.`);
+      }
+      return {
+        productId: item.productId,
+        quantity: item.quantity,
+        price,
+      };
+    });
+
+    const totalPrice = itemsWithPrice.reduce(
+      (sum, item) => sum + item.price * item.quantity,
       0
     );
 
@@ -20,11 +46,7 @@ export const createOrderWithItems = async (
         addressId,
         totalPrice,
         items: {
-          create: items.map((item) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            price: item.price,
-          })),
+          create: itemsWithPrice,
         },
       },
       include: {
