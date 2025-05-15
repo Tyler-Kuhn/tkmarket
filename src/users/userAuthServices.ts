@@ -2,7 +2,6 @@ import prisma from "../config/db";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import AppError from "../errors/appError";
-import { User } from "../config/interfaces";
 
 const secretKey: string = process.env.SECRET_KEY || "defaultSecretKey";
 const saltRounds = 10;
@@ -23,7 +22,7 @@ export const registerUser = async (
   });
 
 
-  const user: User | null = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: {
       email,
     },
@@ -39,7 +38,7 @@ export const registerUser = async (
 };
 
 export const loginUser = async (email: string, password: string) => {
-  const user: User | null = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: {
       email,
     },
