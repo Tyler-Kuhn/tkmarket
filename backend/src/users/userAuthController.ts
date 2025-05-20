@@ -25,7 +25,7 @@ export const register = catchFunction(
       const error = new AppError("Something went wrong", 500);
       return next(error);
     }
-    res.status(201).json(newUserToken);
+    res.status(201).json({newUserToken});
   }
 );
 
