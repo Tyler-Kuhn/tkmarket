@@ -32,7 +32,7 @@ export default function Register() {
 
       navigate("/");
     } catch (error) {
-      console.error("Error registering user:", error);
+      console.error("Error logging in user:", error);
     }
   };
 
