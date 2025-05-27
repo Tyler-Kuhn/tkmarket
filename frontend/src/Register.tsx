@@ -7,36 +7,48 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const res = await fetch(API_ENDPOINTS.REGISTER, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password }),
-      });
+  try {
+    const res = await fetch(API_ENDPOINTS.REGISTER, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, email, password }),
+    });
 
-      if (!res.ok) {
-        const error = await res.json();
-        console.error("Registration failed:", error);
-        return;
+    if (!res.ok) {
+      const errorData = await res.json();
+
+      let errorMessage = "Something went wrong. Please try again.";
+
+      if (errorData.error) {
+        errorMessage = errorData.error;
       }
 
-      const data = await res.json();
-      console.log("User registered:", data);
+      console.error("Registration failed:", errorMessage);
 
-      localStorage.setItem("token", data.newUserToken);
-
-      navigate("/");
-    } catch (error) {
-      console.error("Error registering user:", error);
+      setError(errorMessage);
+      return;
     }
-  };
+
+    const data = await res.json();
+    console.log("User registered:", data);
+
+    localStorage.setItem("token", data.newUserToken);
+
+    navigate("/");
+  } catch (error) {
+    console.error("Error registering user:", error);
+    setError("An unexpected error occurred. Please try again.");
+  }
+};
 
   return (
     <div>
@@ -107,6 +119,9 @@ export default function Register() {
           </p>
         </div>
       </div>
+       {error && (
+        <div className="mt-4 text-red-600 text-sm text-center">{error}</div>
+      )}
     </div>
   );
 }
