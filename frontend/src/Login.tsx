@@ -1,17 +1,20 @@
 import NavBar from "./components/NavBar";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_ENDPOINTS } from "./constants/api";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
 
     try {
-      const res = await fetch("http://localhost:5000/users/login", {
+      const res = await fetch(API_ENDPOINTS.LOGIN, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -20,8 +23,19 @@ export default function Login() {
       });
 
       if (!res.ok) {
-        const error = await res.json();
-        console.error("Login failed:", error);
+        let errorMessage = "Something went wrong. Please try again.";
+
+        try {
+          const errorData = await res.json();
+          if (errorData.message) {
+            errorMessage = errorData.message;
+          }
+        } catch {
+          errorMessage = "Server error. Please try again later.";
+        }
+
+        console.error("Login failed:", errorMessage);
+        setError(errorMessage);
         return;
       }
 
@@ -29,10 +43,10 @@ export default function Login() {
       console.log("User Logged In:", data);
 
       localStorage.setItem("token", data.token);
-
       navigate("/");
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error logging in user:", error);
+      setError("Network error. Please check your connection.");
     }
   };
 
@@ -83,6 +97,9 @@ export default function Login() {
           </form>{" "}
         </div>
       </div>
+      {error && (
+        <div className="mt-4 text-red-600 text-sm text-center">{error}</div>
+      )}
     </div>
   );
 }

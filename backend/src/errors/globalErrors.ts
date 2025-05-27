@@ -10,7 +10,7 @@ export default function globalErrorHandler(
   console.error("Global error handler:", err);
 
   if (err instanceof AppError) {
-    return res.status(err.statusCode).json({ error: err.message });
+    return res.status(err.statusCode).json({ message: err.message });
   }
 
   return res.status(500).json({

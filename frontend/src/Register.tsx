@@ -1,6 +1,7 @@
 import NavBar from "./components/NavBar";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_ENDPOINTS } from "./constants/api";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -12,7 +13,7 @@ export default function Register() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:5000/users/register", {
+      const res = await fetch(API_ENDPOINTS.REGISTER, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -31,7 +32,7 @@ export default function Register() {
 
       localStorage.setItem("token", data.newUserToken);
 
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       console.error("Error registering user:", error);
     }

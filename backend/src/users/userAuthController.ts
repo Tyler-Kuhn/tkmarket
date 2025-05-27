@@ -34,7 +34,7 @@ export const login = catchFunction(
     const { email, password } = req.body;
 
     if (!email || !password) {
-      const error = new AppError("Missing required fields", 400);
+      const error = new AppError("Missing email or password", 400);
       return next(error);
     }
 
