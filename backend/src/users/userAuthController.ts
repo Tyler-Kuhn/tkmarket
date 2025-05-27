@@ -25,7 +25,7 @@ export const register = catchFunction(
       const error = new AppError("Something went wrong", 500);
       return next(error);
     }
-    res.status(201).json(newUserToken);
+    res.status(201).json({newUserToken});
   }
 );
 
@@ -34,7 +34,7 @@ export const login = catchFunction(
     const { email, password } = req.body;
 
     if (!email || !password) {
-      const error = new AppError("Missing required fields", 400);
+      const error = new AppError("Missing email or password", 400);
       return next(error);
     }
 
