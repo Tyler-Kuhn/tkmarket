@@ -53,13 +53,16 @@ export default function ProductDetail() {
         <img
           src={product.image || "/placeholder.png"}
           alt={product.name}
-          className="w-full h-64 object-cover rounded-xl"
+          className="w-full h-64 object-fit rounded-xl"
         />
         <h1 className="mt-6 text-3xl font-bold">{product.name}</h1>
         <p className="mt-4 text-lg text-gray-600">{product.description}</p>
         <div className="mt-6 text-2xl font-semibold text-blue-700">
           ${product.price}
         </div>
+        <button className="bg-blue-600 text-white px-4 py-2 me-5 rounded-lg hover:bg-blue-700 transition">
+          Add to cart
+        </button>
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
           onClick={() => navigate(`/products`)}

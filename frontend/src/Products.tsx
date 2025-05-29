@@ -56,7 +56,7 @@ export default function Products() {
             <img
               src={product.image || "/placeholder.png"}
               alt={product.name}
-              className="w-full h-48 object-cover"
+              className="w-full h-48 object-fit"
             />
             <div className="p-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -69,6 +69,9 @@ export default function Products() {
                 <span className="text-xl font-bold text-gray-900 dark:text-white">
                   ${product.price}
                 </span>
+                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                  Add to cart
+                </button>
                 <button
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
                   onClick={() => navigate(`/products/${product.id}`)}
