@@ -13,9 +13,9 @@ interface Product {
 
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     const fetchProducts = async () => {
       try {

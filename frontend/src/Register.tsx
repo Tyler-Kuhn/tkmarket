@@ -4,51 +4,50 @@ import { useNavigate } from "react-router-dom";
 import { API_ENDPOINTS } from "./constants/api";
 
 export default function Register() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const res = await fetch(API_ENDPOINTS.REGISTER, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, email, password }),
-    });
+    try {
+      const res = await fetch(API_ENDPOINTS.REGISTER, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-    if (!res.ok) {
-      const errorData = await res.json();
+      if (!res.ok) {
+        const errorData = await res.json();
 
-      let errorMessage = "Something went wrong. Please try again.";
+        let errorMessage = "Something went wrong. Please try again.";
 
-      if (errorData.error) {
-        errorMessage = errorData.error;
+        if (errorData.error) {
+          errorMessage = errorData.error;
+        }
+
+        console.error("Registration failed:", errorMessage);
+
+        setError(errorMessage);
+        return;
       }
 
-      console.error("Registration failed:", errorMessage);
+      const data = await res.json();
+      console.log("User registered:", data);
 
-      setError(errorMessage);
-      return;
+      localStorage.setItem("token", data.newUserToken);
+
+      navigate("/");
+    } catch (error) {
+      console.error("Error registering user:", error);
+      setError("An unexpected error occurred. Please try again.");
     }
-
-    const data = await res.json();
-    console.log("User registered:", data);
-
-    localStorage.setItem("token", data.newUserToken);
-
-    navigate("/");
-  } catch (error) {
-    console.error("Error registering user:", error);
-    setError("An unexpected error occurred. Please try again.");
-  }
-};
+  };
 
   return (
     <div>
@@ -119,7 +118,7 @@ export default function Register() {
           </p>
         </div>
       </div>
-       {error && (
+      {error && (
         <div className="mt-4 text-red-600 text-sm text-center">{error}</div>
       )}
     </div>
