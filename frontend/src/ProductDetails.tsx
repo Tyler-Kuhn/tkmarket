@@ -2,14 +2,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { API_ENDPOINTS } from "./constants/api";
 import NavBar from "./components/NavBar";
+import { Product } from "./constants/interfaces";
 
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: string;
-  image?: string;
-}
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -22,13 +16,21 @@ export default function ProductDetail() {
       try {
         const res = await fetch(`${API_ENDPOINTS.PRODUCTS}/${id}`);
         if (!res.ok) {
-          const errorData = await res.json();
-          setError(errorData.error || "Product not found");
+          try {
+            const errorData = await res.json();
+            const message =
+              typeof errorData?.error === "string"
+                ? errorData.error
+                : "Something went wrong while fetching the product.";
+            setError(message);
+          } catch {
+            setError("Unexpected error occurred.");
+          }
           return;
         }
 
         const data = await res.json();
-        setProduct(data[0]);
+        setProduct(data);
       } catch (err) {
         console.error("Error fetching product:", err);
         setError("Network error");
