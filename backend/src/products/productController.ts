@@ -43,7 +43,7 @@ export const getAproduct = catchFunction(
 
     if (!product) {
       const error = new AppError("Product not found", 404);
-      next(error);
+      return next(error);
     }
 
     res.status(200).json(product);
