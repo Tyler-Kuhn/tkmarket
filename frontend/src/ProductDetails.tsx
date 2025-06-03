@@ -5,7 +5,7 @@ import NavBar from "./components/NavBar";
 import { Product } from "./constants/interfaces";
 
 
-export default function ProductDetail() {
+export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [error, setError] = useState<string | null>(null);
