@@ -109,7 +109,7 @@ export default function NavBar() {
                 >
                   <MenuItem>
                     <NavLink
-                      to="/profile"
+                      to="/account"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Your Profile
