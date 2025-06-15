@@ -10,6 +10,7 @@ import ProductDetail from "./ProductDetails";
 import Account from "./Account";
 import Orders from "./Orders";
 
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>

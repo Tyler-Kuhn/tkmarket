@@ -5,5 +5,6 @@ export const API_ENDPOINTS = {
   REGISTER: `${BASE_URL}/users/register`,
   PRODUCTS: `${BASE_URL}/products/products`,
   ACCOUNT: `${BASE_URL}/users/user`,
-  ORDERS: `${BASE_URL}/orders/orders`
+  ORDERS: `${BASE_URL}/orders/orders`,
+  ADDRESSES: `${BASE_URL}/address/addresses`
 };

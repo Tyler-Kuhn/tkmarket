@@ -11,3 +11,8 @@ export interface User {
   name: string;
   email: string;
 }
+
+export type Address = {
+  id: number;
+  address: string;
+};
