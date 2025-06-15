@@ -74,15 +74,16 @@ export const updateUser = catchFunction(
     const userId = req.user?.userId;
 
     if (!userId) {
-      const error = new AppError("Unauthorized", 401);
-      return next(error);
+      return next(new AppError("Unauthorized", 401));
     }
-    
-    const { name, email } = req.body;
 
-    const updatedUser = await updateUserById(userId, name, email);
+    const { name, email, password } = req.body;
 
+    const updatedUser = await updateUserById(userId, name, email, password);
 
-    res.status(201).json(updatedUser);
+  
+    const { password: _, ...safeUser } = updatedUser;
+
+    res.status(200).json(safeUser);
   }
 );
