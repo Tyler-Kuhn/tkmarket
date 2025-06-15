@@ -14,5 +14,10 @@ export interface User {
 
 export type Address = {
   id: number;
-  address: string;
+  type: string;
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
 };
