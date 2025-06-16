@@ -7,6 +7,7 @@ import { User, Address } from "./constants/interfaces";
 export default function Account() {
   const [user, setUser] = useState<User | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -21,9 +22,7 @@ export default function Account() {
         }
 
         const res = await fetch(API_ENDPOINTS.ACCOUNT, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!res.ok) {
@@ -45,14 +44,10 @@ export default function Account() {
         setUser(data);
 
         const addressRes = await fetch(API_ENDPOINTS.ADDRESSES, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (!addressRes.ok) {
-          console.error("Failed to fetch addresses");
-        } else {
+        if (addressRes.ok) {
           const addressData = await addressRes.json();
           setAddresses(addressData);
         }
@@ -64,6 +59,100 @@ export default function Account() {
 
     fetchUser();
   }, [navigate]);
+
+  const handleDeleteAddress = async (id: number) => {
+    const token = localStorage.getItem("token");
+    if (!token) return setError("Unauthorized");
+
+    try {
+      const res = await fetch(`${API_ENDPOINTS.ADDRESSES}/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) return setError("Failed to delete address");
+
+      setAddresses((prev) => prev.filter((addr) => addr.id !== id));
+    } catch {
+      setError("Network error. Try again later.");
+    }
+  };
+
+  const handleEditAddress = (address: Address) => {
+    setEditingAddress(address);
+  };
+
+  const handleAddressSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+    if (!token) return setError("You must be logged in.");
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const street = formData.get("street");
+    const city = formData.get("city");
+    const state = formData.get("state");
+    const zip = formData.get("zip");
+    const country = formData.get("country");
+    const type = formData.get("type");
+
+    const body = {
+      street,
+      city,
+      state,
+      zip,
+      country,
+      type,
+    };
+
+    try {
+      let res;
+      if (editingAddress) {
+        // Update existing address
+        res = await fetch(`${API_ENDPOINTS.ADDRESSES}/${editingAddress.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(body),
+        });
+      } else {
+        // Add new address
+        res = await fetch(API_ENDPOINTS.ADDRESSES, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(body),
+        });
+      }
+
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || "Failed to save address");
+        return;
+      }
+
+      const savedAddress = await res.json();
+      if (editingAddress) {
+        setAddresses((prev) =>
+          prev.map((addr) =>
+            addr.id === savedAddress.id ? savedAddress : addr
+          )
+        );
+      } else {
+        setAddresses((prev) => [...prev, savedAddress]);
+      }
+
+      setEditingAddress(null);
+      form.reset();
+      setError(null);
+    } catch {
+      setError("Failed to save address. Try again later.");
+    }
+  };
 
   return (
     <div>
@@ -103,22 +192,85 @@ export default function Account() {
                         {addr.city}, {addr.state} {addr.zip}
                       </div>
                       <div>{addr.country}</div>
+                      <div className="flex gap-4 mt-2">
+                        <button
+                          onClick={() => handleEditAddress(addr)}
+                          className="text-blue-600 hover:underline text-xs"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteAddress(addr.id)}
+                          className="text-red-600 hover:underline text-xs"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </li>
                   ))
                 )}
               </ul>
             </div>
 
-            <div>
-              <button
-                onClick={() => navigate("/orders")}
-                className="flex w-full justify-center rounded-md bg-gray-800 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-gray-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            <form onSubmit={handleAddressSubmit} className="space-y-4 mt-6">
+              <h3 className="font-semibold">
+                {editingAddress ? "Edit Address" : "Add New Address"}
+              </h3>
+              <input
+                name="street"
+                required
+                defaultValue={editingAddress?.street || ""}
+                placeholder="Street"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              />
+              <input
+                name="city"
+                required
+                defaultValue={editingAddress?.city || ""}
+                placeholder="City"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              />
+              <input
+                name="state"
+                required
+                defaultValue={editingAddress?.state || ""}
+                placeholder="State"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              />
+              <input
+                name="zip"
+                required
+                defaultValue={editingAddress?.zip || ""}
+                placeholder="Zip Code"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              />
+              <input
+                name="country"
+                required
+                defaultValue={editingAddress?.country || ""}
+                placeholder="Country"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              />
+              <select
+                name="type"
+                required
+                defaultValue={editingAddress?.type || ""}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
               >
-                View Orders
-              </button>
-            </div>
+                <option value="">Select Type</option>
+                <option value="billing">Billing</option>
+                <option value="shipping">Shipping</option>
+                <option value="billing/shipping">Billing/Shipping</option>
+              </select>
 
-            {/* Update Email/Password Form */}
+              <button
+                type="submit"
+                className="w-full rounded-md bg-green-600 py-2 px-4 text-white hover:bg-green-500"
+              >
+                {editingAddress ? "Update Address" : "Add Address"}
+              </button>
+            </form>
+              {/* Update Email/Password Form */}
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
@@ -165,7 +317,6 @@ export default function Account() {
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   New Password
@@ -177,7 +328,6 @@ export default function Account() {
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                 />
               </div>
-
               <button
                 type="submit"
                 className="w-full rounded-md bg-indigo-600 py-2 px-4 text-white hover:bg-indigo-500"
@@ -186,126 +336,6 @@ export default function Account() {
               </button>
             </form>
 
-            {/* Add New Address Form */}
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const token = localStorage.getItem("token");
-                if (!token) return setError("You must be logged in.");
-
-                const formData = new FormData(e.currentTarget);
-                const street = formData.get("street");
-                const city = formData.get("city");
-                const state = formData.get("state");
-                const zip = formData.get("zip");
-                const country = formData.get("country");
-                const type = formData.get("type");
-
-                try {
-                  const res = await fetch(API_ENDPOINTS.ADDRESSES, {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                      street,
-                      city,
-                      state,
-                      zip,
-                      country,
-                      type,
-                    }),
-                  });
-
-                  if (!res.ok) {
-                    const data = await res.json();
-                    setError(data.error || "Failed to add address");
-                    return;
-                  }
-
-                  const newAddress = await res.json();
-                  setAddresses((prev) => [...prev, newAddress]);
-                  setError(null);
-                  e.currentTarget.reset();
-                } catch {
-                  setError("Failed to add address. Try again later.");
-                }
-              }}
-              className="space-y-4 mt-6"
-            >
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Street
-                </label>
-                <input
-                  name="street"
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  City
-                </label>
-                <input
-                  name="city"
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  State
-                </label>
-                <input
-                  name="state"
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Zip Code
-                </label>
-                <input
-                  name="zip"
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Country
-                </label>
-                <input
-                  name="country"
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Type
-                </label>
-                <select
-                  name="type"
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                >
-                  <option value="">Select Type</option>
-                  <option value="billing">Billing</option>
-                  <option value="shipping">Shipping</option>
-                  <option value="billing/shipping">Billing/Shipping</option>
-                </select>
-              </div>
-              <button
-                type="submit"
-                className="w-full rounded-md bg-green-600 py-2 px-4 text-white hover:bg-green-500"
-              >
-                Add Address
-              </button>
-            </form>
           </div>
         ) : error ? (
           <div className="mt-4 text-red-600 text-sm text-center">{error}</div>
