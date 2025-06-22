@@ -69,10 +69,17 @@ export const getUserById = async (userId: number) => {
 export const updateUserById = async (
   userId: number,
   name?: string,
-  email?: string
+  email?: string,
+  password?: string
 ) => {
+  const data: any = {};
+
+  if (name !== undefined) data.name = name;
+  if (email !== undefined) data.email = email;
+  if (password) data.password = await bcrypt.hash(password, 12);
+
   return await prisma.user.update({
     where: { id: userId },
-    data: { name, email },
+    data,
   });
 };

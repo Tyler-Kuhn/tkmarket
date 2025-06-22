@@ -10,6 +10,6 @@ router.post("/login", login);
 
 router.get("/user", authenticateToken, getUser);
 
-router.put("/user", authenticateToken, updateUser);
+router.patch("/user", authenticateToken, updateUser);
 
 export default router

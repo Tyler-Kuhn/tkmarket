@@ -8,7 +8,7 @@ export const createOrderWithItems = async (
   addressId: number,
   items: OrderItems[]
 ) => {
-  return await prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx: { product: { findMany: (arg0: { where: { id: { in: any[]; }; }; select: { id: boolean; price: boolean; }; }) => any; }; order: { create: (arg0: { data: { userId: number; addressId: number; totalPrice: number; items: { create: { productId: any; quantity: any; price: number; }[]; }; }; include: { items: boolean; address: boolean; }; }) => any; }; }) => {
     
     const productIds = items.map((item) => item.productId);
     const products = await tx.product.findMany({
@@ -64,7 +64,11 @@ export const getUserOrders = async (userId: number) => {
   return await prisma.order.findMany({
     where: { userId },
     include: {
-      items: true,
+      items: {
+        include: {
+          product: true,
+        },
+      },
       address: true,
     },
     orderBy: { orderedAt: "desc" },
@@ -91,7 +95,7 @@ export const updateOrderWithItems = async (
     items?: OrderItems[];
   }
 ) => {
-  return await prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx: { order: { findUnique: (arg0: { where: { id: number; }; include: { items: boolean; }; }) => any; update: (arg0: { where: { id: number; }; data: { status: string | undefined; addressId: number | undefined; totalPrice: any; }; include: { items: boolean; address: boolean; }; }) => any; }; orderItems: { findMany: (arg0: { where: { orderId: number; }; }) => any; delete: (arg0: { where: { id: any; }; }) => any; update: (arg0: { where: { id: any; }; data: { quantity: any; price: any; }; }) => any; createMany: (arg0: { data: { orderId: number; productId: any; quantity: any; price: any; }[]; }) => any; }; }) => {
     const existingOrder = await tx.order.findUnique({
       where: { id: orderId },
       include: { items: true },
@@ -109,8 +113,8 @@ export const updateOrderWithItems = async (
       });
 
       const existingMap = new Map(
-        existingItems.map((item) => [`${item.productId}`, item])
-      );
+  (existingItems as OrderItems[]).map((item) => [`${item.productId}`, item])
+);
 
       const newMap = new Map(
         data.items.map((item) => [`${item.productId}`, item])
@@ -127,7 +131,7 @@ export const updateOrderWithItems = async (
         );
       });
       const toDelete = existingItems.filter(
-        (item) => !newMap.has(`${item.productId}`)
+        (item: { productId: any; }) => !newMap.has(`${item.productId}`)
       );
 
       for (const item of toDelete) {
