@@ -56,7 +56,7 @@ export const addItemToCart = async (
   });
 };
 
-export const updateCartItem = async (
+export const updateCartItemQuantity = async (
   cartItemId: number,
   quantity: number
 ): Promise<CartItem> => {
@@ -77,4 +77,4 @@ export const clearUserCart = async (userId: number): Promise<void> => {
   if (cart) {
     await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
   }
-}
+};
